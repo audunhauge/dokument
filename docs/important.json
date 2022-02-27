@@ -1,0 +1,33 @@
+{
+    "translate": {
+        "cement":"sement"
+    },
+    "together": [
+        "norsk stein",
+        "heidelberg sement"
+    ],
+    "important": [
+        "søknad",
+        "avslag",
+        "utbygging",
+        "utviding",
+        "sprengning",
+        "løsmasse",
+        "konsesjon",
+        "brudd",
+        "avvik",
+        "overtredelse"
+    ],
+    "--bland words that are just too frequent --":"suppress them",
+    "bland": [
+        "kommune",
+        "kommunen",
+        "telefon",
+        "suldal",
+        "sør",
+        "postboks",
+        "datert",
+        "kopi",
+        "valgt"
+    ]
+}

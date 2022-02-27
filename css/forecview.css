@@ -1,0 +1,27 @@
+#force {
+    width: 900px;
+    height: 900px;
+    position: fixed;
+}
+
+#holding {
+    position: relative;
+    width: 900px;
+    height: 900px;
+}
+
+
+#text {
+  max-width: 45rem;
+  min-height: 12rem;
+}
+
+main {
+    display:grid;
+    grid-template-columns: 900px 1fr;
+    gap: 2rem;
+}
+
+span.linked {
+    color:blue;
+}
