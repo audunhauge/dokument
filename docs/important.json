@@ -28,6 +28,7 @@
         "postboks",
         "datert",
         "kopi",
-        "valgt"
+        "valgt",
+        "underskrift"
     ]
 }

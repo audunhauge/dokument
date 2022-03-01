@@ -16,7 +16,14 @@
 <body>
     <main>
         <div id="holding">
-            <div id="force"></div>
+            <div id="gui" class="minos">
+                {teller}
+                <div><label>Søkeord : <input list="complete" type="text" id="seek"></label></div>
+                <datalist id="complete">
+                </datalist>
+                <div><label>Koblinger : <input type="range" min="1" max="100" id="bonds"> {bonds} </label></div>
+                <div id="force"></div>
+            </div>
         </div>
         <div id="text">
         </div>

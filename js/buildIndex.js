@@ -1,9 +1,41 @@
 // @ts-check
 
-import { range } from './util.js';
+import { range, $ } from './util.js';
+import { select, unselect, update, comp } from './force.js';
+import { trial, build } from './trie.js';
 
 // @ts-ignore
 const md = new remarkable.Remarkable("full", { html: true });
+
+const textview = $("text");
+
+
+export const sekme = (e) => {
+    if (e.key === "Enter") {
+        unselect();
+        update();
+    }
+    // @ts-ignore
+    const word = e.target.value;
+    if (word && word.length > 1) {
+        const node = trie.lookup(word);
+        if (!node) return;  // not in dictionary
+        const children = trie.childList(word.slice(0, -1), node);
+        if (children.length < 200 && children.length > 1) {
+            comp.innerHTML = children.map(v => `<option>${v}</option>`).join("");
+        }
+        if (!node.final) return;
+        const a = word.charAt(0);
+        const info = wordlist[a][word];
+        if (info) {
+            unselect();
+            Object.keys(info.fname).forEach(select);
+            update();
+        }
+    }
+}
+
+
 
 let skipwords;
 const wordlist = {
@@ -21,8 +53,8 @@ export function show(node, div) {
     const words = new Set(list.map(e => e.words).flat());
     if (lookup[node.id] !== undefined) {
         const inner = md.render(text[lookup[node.id]].t);
-        const hilit = inner.replace(/([A-Z_a-zæøåÆÅØ]+)([-+.<>{},;\[\]:() *\f\n\r\t\v\u00A0\u2028\u2029])/g, function (m, wo,sep) {
-            if (words.has(wo) && ! supressed.has(wo)) {
+        const hilit = inner.replace(/([A-Z_a-zæøåÆÅØ]+)([-+.<>{},;\[\]:() *\f\n\r\t\v\u00A0\u2028\u2029])/g, function (m, wo, sep) {
+            if (words.has(wo) && !supressed.has(wo)) {
                 return `<span class="linked">${wo}</span>${sep}`
             }
             return m;
@@ -33,10 +65,33 @@ export function show(node, div) {
     }
 }
 
+textview.addEventListener("click", e => {
+    const t = e.target;
+    // @ts-ignore
+    if (t.classList.contains("linked")) {
+        // @ts-ignore
+        const word = t.innerText;
+        if (word) {
+            const a = word.charAt(0);
+            const info = wordlist[a][word];
+            if (info) {
+                Object.keys(info.fname).forEach(select);
+                update();
+            }
+        }
+    } else {
+        unselect();
+        update();
+    }
+})
+
 let text;
 let links;
 let supressed;
 const lookup = {};
+let trie;
+
+//export const indict = word => trieup(trie,word);
 
 
 export async function setup() {
@@ -53,8 +108,11 @@ export async function setup() {
     // buildLinks();
     linkedTexts();
     const nodes = text.map(n => ({ id: n.id, group: 1, value: 123 }));
-    links = prune(relations);
+    links = prune();
     text.forEach((e, i) => lookup[e.id] = i);
+
+    const plainwords = Object.keys(wordlist).map(k => Object.keys(wordlist[k])).flat();
+    trie = trial(build(plainwords));
     return { nodes, links };
 
 }
@@ -66,7 +124,7 @@ const freq = word => {
 }
 
 
-function prune(relations, limit = 1) {
+export function prune(limit = 15) {
     const links = [];
     for (const s in relations) {
         const targs = relations[s];
@@ -138,7 +196,7 @@ async function readFile(fname) {
         console.log(e);
     })
     if (!res || res && !res.ok) return '';
-    const [_,type] = fname.split(".");
+    const [_, type] = fname.split(".");
     const dex = await (type === "json") ? res.json() : res.text();
     return dex;
 }
